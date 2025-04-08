@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard ClickUp</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background-color: #f7f7f7;
+    }
+    h1 {
+      color: #222;
+    }
+    canvas {
+      max-width: 800px;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>📊 Dashboard ClickUp – Lista 1195</h1>
+  <p>Visualizzazione dei task per stato.</p>
+  <canvas id="tasksChart"></canvas>
+
+  <script>
+    async function loadTasks() {
+      const response = await fetch("https://api.clickup.com/api/v2/list/1195/task", {
+        headers: {
+          "Authorization": "pk_94555349_Q1YLCZMJ6GE9RTAV592PG00U5HN4TN9S"
+        }
+      });
+
+      const data = await response.json();
+
+      const statusCount = {};
+      data.tasks.forEach(task => {
+        const status = task.status.status;
+        statusCount[status] = (statusCount[status] || 0) + 1;
+      });
+
+      const ctx = document.getElementById("tasksChart").getContext("2d");
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(statusCount),
+          datasets: [{
+            label: 'Numero di Task',
+            data: Object.values(statusCount),
+            backgroundColor: 'rgba(54, 162, 235, 0.6)'
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        }
+      });
+    }
+
+    loadTasks();
+  </script>
+</body>
+</html>
